@@ -40,6 +40,17 @@ var AUTOPREFIXER_BROWSERS = [
   'bb >= 10'
 ];
 
+var startServer = function(cb) {
+  var called = false;
+  return $.nodemon({script: 'index.js', ignore: "node_modules/**/**.**"})
+    .on('start', function() {
+      if (!called) {
+        called = true;
+        cb();
+      }
+    });
+};
+
 // Lint JavaScript
 gulp.task('jshint', function () {
   return gulp.src('app/scripts/**/*.js')
@@ -80,6 +91,7 @@ gulp.task('styles', function () {
   return gulp.src([
       'app/styles/*.scss',
       'app/styles/**/*.css',
+      'app/styles/**/*.styl',
       'app/styles/components/components.scss'
     ])
     .pipe($.changed('.tmp/styles', {extension: '.css'}))
@@ -89,6 +101,7 @@ gulp.task('styles', function () {
     })
     .on('error', console.error.bind(console))
     ))
+    .pipe($.if('*.styl', $.stylus()))
     .pipe($.autoprefixer(AUTOPREFIXER_BROWSERS))
     .pipe(gulp.dest('.tmp/styles'))
     .pipe($.size({title: 'styles'}));
@@ -105,23 +118,24 @@ gulp.task('html', function () {
     // Remove Any Unused CSS
     // Note: If not using the Style Guide, you can delete it from
     // the next line to only include styles your project uses.
-    .pipe($.if('*.css', $.uncss({
-      html: [
-        'app/index.html',
-        'app/styleguide/index.html'
-      ],
-      // CSS Selectors for UnCSS to ignore
-      ignore: [
-        '.navdrawer-container.open',
-        /.app-bar.open/
-      ]
-    })))
+    // .pipe($.if('*.css', $.uncss({
+    //   html: [
+    //     'app/index.html',
+    //     'app/styleguide/index.html'
+    //   ],
+    //   // CSS Selectors for UnCSS to ignore
+    //   ignore: [
+    //     '.navdrawer-container.open',
+    //     /.app-bar.open/
+    //   ]
+    // })))
     // Concatenate And Minify Styles
     .pipe($.if('*.css', $.csso()))
     .pipe(assets.restore())
     .pipe($.useref())
     // Update Production Style Guide Paths
     .pipe($.replace('components/components.css', 'components/main.min.css'))
+    .pipe($.replace('app/app.css', 'app/app.min.css'))
     // Minify Any HTML
     .pipe($.if('*.html', $.minifyHtml()))
     // Output Files
@@ -129,39 +143,51 @@ gulp.task('html', function () {
     .pipe($.size({title: 'html'}));
 });
 
+gulp.task('nodemon:dev', function(cb) {
+  process.env.NODE_ENV = 'development';
+  process.env.PORT = 3001;
+  return startServer(cb);
+});
+
+gulp.task('nodemon:prod', function(cb) {
+  process.env.NODE_ENV = 'production';
+  process.env.PORT = 3000;
+  return startServer(cb);
+});
+
 // Clean Output Directory
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
 // Watch Files For Changes & Reload
-gulp.task('serve', ['styles'], function () {
+gulp.task('serve', ['styles', 'nodemon:dev'], function () {
   browserSync({
     notify: false,
     // Run as an https by uncommenting 'https: true'
     // Note: this uses an unsigned certificate which on first access
     //       will present a certificate warning in the browser.
     // https: true,
-    server: {
-      baseDir: ['.tmp', 'app']
-    }
+    proxy: 'localhost:3001'
   });
 
   gulp.watch(['app/**/*.html'], reload);
-  gulp.watch(['app/styles/**/*.{scss,css}'], ['styles', reload]);
+  gulp.watch(['app/styles/**/*.{scss,css,styl}'], ['styles', reload]);
   gulp.watch(['app/scripts/**/*.js'], ['jshint']);
   gulp.watch(['app/images/**/*'], reload);
 });
 
 // Build and serve the output from the dist build
-gulp.task('serve:dist', ['default'], function () {
+gulp.task('serve:dist', ['default', 'nodemon:prod'], function () {
   browserSync({
     notify: false,
     // Run as an https by uncommenting 'https: true'
     // Note: this uses an unsigned certificate which on first access
     //       will present a certificate warning in the browser.
     // https: true,
-    server: {
-      baseDir: 'dist'
-    }
+    // server: {
+    //   baseDir: 'dist'
+    // },
+
+    proxy: 'localhost:3000'
 
   });
 });
