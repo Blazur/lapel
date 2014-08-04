@@ -1,21 +1,23 @@
-var express = require('express');
+'use strict';
 
-var app = express();
-var morgan = require('morgan');
-var env = app.get('env');
-app.set('port', process.env.PORT)
+var express   = require('express'),
+    passport  = require('passport'),
+    app       = express(),
+    env       = app.get('env');
+
+app.set('port', process.env.PORT);
 app.use(morgan('dev'));
+
 if (env === 'production') {
   app.use(express.static(__dirname + '/../dist'));
 } else {
-  app.use(express.static(__dirname + '/../.tmp'));
   app.use(express.static(__dirname + '/../app'));
-  // app.use(express.static(__dirname + '/../dist'));
-
+  app.use(express.static(__dirname + '/../.tmp'));
 }
 
-app.get('/test', function(req, res) {
-  res.send('yo');
-});
+app.use(express.static(__dirname + '/../bower_components'));
+
+require('./server/config/passportConfig.js')(passport);
+require('./server/config/serverConfig.js')(app, express, passport);
 
 module.exports = app;
