@@ -40,17 +40,6 @@ var AUTOPREFIXER_BROWSERS = [
   'bb >= 10'
 ];
 
-var startServer = function(cb) {
-  var called = false;
-  return $.nodemon({script: 'index.js', ignore: "node_modules/**/**.**"})
-    .on('start', function() {
-      if (!called) {
-        called = true;
-        cb();
-      }
-    });
-};
-
 // Lint JavaScript
 gulp.task('jshint', function () {
   return gulp.src('app/scripts/**/*.js')
@@ -104,6 +93,7 @@ gulp.task('styles', function () {
     .pipe($.if('*.styl', $.stylus()))
     .pipe($.autoprefixer(AUTOPREFIXER_BROWSERS))
     .pipe(gulp.dest('.tmp/styles'))
+    // .pipe(gulp.dest('./styles'))
     .pipe($.size({title: 'styles'}));
 });
 
@@ -143,30 +133,21 @@ gulp.task('html', function () {
     .pipe($.size({title: 'html'}));
 });
 
-gulp.task('nodemon:dev', function(cb) {
-  process.env.NODE_ENV = 'development';
-  process.env.PORT = 3001;
-  return startServer(cb);
-});
-
-gulp.task('nodemon:prod', function(cb) {
-  process.env.NODE_ENV = 'production';
-  process.env.PORT = 3000;
-  return startServer(cb);
-});
-
 // Clean Output Directory
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
 // Watch Files For Changes & Reload
-gulp.task('serve', ['styles', 'nodemon:dev'], function () {
+gulp.task('serve', ['styles'], function () {
   browserSync({
     notify: false,
     // Run as an https by uncommenting 'https: true'
     // Note: this uses an unsigned certificate which on first access
     //       will present a certificate warning in the browser.
     // https: true,
-    proxy: 'localhost:3001'
+    server: {
+      baseDir: ['.tmp', 'app']
+    },
+
   });
 
   gulp.watch(['app/**/*.html'], reload);
@@ -183,12 +164,9 @@ gulp.task('serve:dist', ['default', 'nodemon:prod'], function () {
     // Note: this uses an unsigned certificate which on first access
     //       will present a certificate warning in the browser.
     // https: true,
-    // server: {
-    //   baseDir: 'dist'
-    // },
-
-    proxy: 'localhost:3000'
-
+    server: {
+      baseDir: 'dist'
+    }
   });
 });
 

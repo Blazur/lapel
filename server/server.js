@@ -6,7 +6,6 @@ var express   = require('express'),
     env       = app.get('env');
 
 app.set('port', process.env.PORT);
-app.use(morgan('dev'));
 
 if (env === 'production') {
   app.use(express.static(__dirname + '/../dist'));
@@ -17,7 +16,7 @@ if (env === 'production') {
 
 app.use(express.static(__dirname + '/../bower_components'));
 
-require('./server/config/passportConfig.js')(passport);
-require('./server/config/serverConfig.js')(app, express, passport);
+require('./config/passportConfig.js')(passport);
+require('./config/serverConfig.js')(app, express, passport);
 
 module.exports = app;

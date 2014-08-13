@@ -1,7 +1,7 @@
 var User      = require('../api/user/userModel.js'),
     Github    = require('passport-github').Strategy,
     Promise   = require('bluebird'),
-    credits   = require('../vars.js').github;
+    credits   = require('./vars.js').github;
 
 var githubCredits = {
   clientID: credits.clientID,
@@ -33,7 +33,7 @@ var sendBackUser = function sendBackUser(token, profile, done) {
 var passportCallback = function passportCallback(token, refresh, profile, done) {
   var findOne = Promise.promisify(User.findOne, User);
 
-  findOne({'github.id', profile.id})
+  findOne({'github.id': profile.id})
     .then(sendBackUser(token, profile, done))
     .catch(done);
 };
