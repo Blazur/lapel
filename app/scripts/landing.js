@@ -20,4 +20,16 @@
 (function($, window) {
   'use strict';
 
-}());
+  // Main Blazer function, controll all options for the app here
+  function Blazur() {
+    // google analytics key
+    this._gaKey = '';
+    this._contactEmail = 'work@blazurlabs.com';
+    this._team = [];
+    this._examples = [];
+  }
+
+  var blazur = new Blazur();
+
+
+}($, window));
