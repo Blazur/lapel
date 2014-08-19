@@ -5,6 +5,7 @@
   background-color canvas
   position fixed
   width 100%
+  z-index 1000
   & .navigation ul
     list-style none !important
     list-style-type none !important
@@ -14,14 +15,17 @@
     margin 0 auto
     & li
       float left
+      padding 4px 8px
+      text-decoration none
+      cursor pointer
+      color black
+      font-size 1.3em
       &::before
         display none
-.nav-link
-  text-decoration none
-  color black
-  &:hover
-    text-decoration none
-    color primary
+      &:hover
+        shadow(1)
+        color primary
+        background-color white
 
 .nav-container
   height 100%

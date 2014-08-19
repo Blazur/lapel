@@ -157,7 +157,7 @@ gulp.task('serve', ['styles'], function () {
 });
 
 // Build and serve the output from the dist build
-gulp.task('serve:dist', ['default', 'nodemon:prod'], function () {
+gulp.task('serve:dist', ['default'], function () {
   browserSync({
     notify: false,
     // Run as an https by uncommenting 'https: true'
