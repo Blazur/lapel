@@ -5,7 +5,12 @@
 @import '_hero'
 @import '_content'
 @import '_services'
+@import '_contact'
+@import '_team'
 
+.icon
+  cursor pointer
+  position relative
 body
   background-color canvas
 
@@ -13,10 +18,14 @@ body
   padding 10px
   border-radius 3px
   width 300px
-  shadow(2)
+  shadow(1)
   background-color white !important
   margin 10px
+  transition all 250ms
   position relative
+  // &:hover
+  //   shadow(3)
+  //   transform translateY(-5px)
 
 
 

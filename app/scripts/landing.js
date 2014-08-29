@@ -40,19 +40,32 @@
 
   // var blazur = new Blazur();
   $(document).ready(function() {
+    var icon = $('.logo.ripple');
+    var header = $('header');
+
+    icon.on('click', function() {
+      header.velocity('scroll', {duration: 1200, easing: 'srping'})
+             .velocity({opacity: 1});
+    });
     var colorHash = {
       'LI': 'd500f9',
-      'DIV': 'd500f9',
+      'DIV': 'aa00ff',
       default: '000000'
     };
 
     var links = $('.nav-link');
-
+    var linksHash = {
+      '#services': -50,
+      '#contact': -70
+    };
     links.on('click', function() {
       var link = $(this);
       var id = '#' + link.text().toLowerCase();
       var section = $(id);
-      section.velocity('scroll', {duration: 1200, easing: 'srping', offset: -50});
+      // section.css('opacity', 0.6);
+      section.velocity('scroll', {duration: 1200, easing: 'srping', offset: linksHash[id]})
+             .velocity({opacity: 1});
+
     });
 
     var ripples = $('.ripple');
@@ -82,7 +95,7 @@
       element.append('<svg style="position: absolute;"><circle cx="'+setX+'" cy="'+setY+'" r="'+0+'"></circle></svg>');
 
       var circle = element.find('circle');
-      circle.css({fill: hexToRgb(color, 0.1)});
+      circle.css({fill: hexToRgb(color, 0.3)});
       circle.velocity({r: calcWidth()}, 'easeOutSine', 500)
             .velocity('fadeOut', {duration: 500, complete: clean});
     });
